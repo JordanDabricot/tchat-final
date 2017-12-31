@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+        <meta charset="UTF-8">
+        <title>{% block title %}Tchat{% endblock %}</title>
+        {% block stylesheets %}{% endblock %}
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+        <link rel="stylesheet" href="style/style.css">
+    <head>
+    </head>
+
+    <body>
+        {% include "header.html.twig" %}
+        {% block body %}
+            <h1>Bienvenue {{ login }}</h1>
+            <div class="message-tchat">
+                <table>
+                    {% for message in messages %}
+                        <tr>
+                            <td>
+                                <b>{{ message.user.login }}</b>
+                            </td>
+                            <td>
+                                {{ message.message }}
+                            </td>
+                            <td>
+                                {{ message.date | date("d-m-y h:i:s") }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <form class="form-register" method="post" action="{{ '/tchat' }}">
+                <div class="form-group">
+                    <input type="text" id="message" name="message" class="form-control" id="exampleInputLogin" aria-describedby="loginHelp" autocomplete="off" placeholder="Entrer votre message">
+                </div>
+                <div class="submit-tchat">
+                    <button type="submit" id="submit" name="submit" class="btn btn-primary">Entrer</button>
+                </div>
+            </form>
+        {% endblock %}
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script type="text/javascript">
+
+                //Connexion websocket
+                var conn = new WebSocket('ws://localhost:8280');
+                conn.onopen = function(e) {
+                    console.log("Connection established!");
+                    conn.send(
+                        JSON.stringify({
+                            'type': 'socket',
+                            'user_id': '{{ login }}'
+                        })
+                    );
+                };
+
+                conn.onmessage = function(e) {
+                    var json = JSON.parse(e.data);
+                    switch (json.type){
+                        case 'chat':
+                            $('#message').append(json.msg);
+                            break;
+                    }
+                };
+
+                $('#message').on('keyup',function(e){
+                    if($('submit') && e.keyCode == 13){
+                        var chat_msg = $(this).val();
+                        conn.send(
+                            JSON.stringify({
+                                'type':'chat',
+                                'user_id':'{{ login }}',
+                                'chat_msg':chat_msg
+                                })
+                        );
+                        $(this).val('');
+                    }
+                });
+        </script>
+    </body>
+</html>

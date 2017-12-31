@@ -1,0 +1,25 @@
+h1{
+    text-align: center;
+}
+.carousel{
+    width: 75%;
+    margin: auto;
+}
+.form-register{
+    width: 50%;
+    margin: auto;
+    margin-top: 7%;
+}
+.form-title{
+    text-align: center;
+}
+.tchat-container{
+    margin: auto;
+}
+.message-tchat{
+    margin: auto auto auto 25%;
+    width: 57%;
+}
+td{
+    width: 10%;
+}
